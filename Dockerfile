@@ -1,10 +1,14 @@
-FROM python:3.7
-ENV PYTHONUNBUFFERED=1
+FROM python:3.8.5-alpine
+
+RUN pip install --upgrade pip
+
+COPY ./requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY ./django_project /app
 
 WORKDIR /app
 
-COPY requirements.txt /app/
+COPY ./entrypoint.sh /
+ENTRYPOINT ["sh", "/entrypoint.sh"]
 
-RUN pip install -r requirements.txt
-
-COPY . ./app

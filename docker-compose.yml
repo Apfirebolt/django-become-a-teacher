@@ -1,4 +1,4 @@
-version: "3"
+version: '3.7'
 
 services:
   db:
@@ -9,23 +9,25 @@ services:
       - POSTGRES_PASSWORD=postgres
     restart: always
 
-  web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
+  django_gunicorn:
     volumes:
-      - .:/app
-
+      - static:/static
+    env_file:
+      - .env
+    build:
+      context: .
     ports:
       - "8000:8000"
+    depends_on: 
+      - db  
+  nginx:
+    build: ./nginx
+    volumes:
+      - static:/static
+    ports:
+      - "8010:80"
     depends_on:
-      - db
+      - django_gunicorn
 
-    server:
-      restart: always
-      build: 
-        dockerfile: Dockerfile
-        context: ./nginx
-      ports:
-        - "80:80"
-
- 
+volumes:
+  static:
